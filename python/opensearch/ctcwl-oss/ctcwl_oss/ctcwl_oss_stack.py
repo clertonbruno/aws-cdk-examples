@@ -113,27 +113,27 @@ class CtcwlOssStack(Stack):
             vpc=vpc,
             memory_size=1024,
             timeout=Duration.minutes(5),
-            code=lambda_.Code.from_asset('lambda')
+            code=lambda_.Code.from_asset("lambda"),
         )
 
         # Load Amazon OpenSearch Service Collection to env variable
         collection_endpoint = col.attr_collection_endpoint.replace("https://", "")
         print(f"\n\nCollection endpoint: {collection_endpoint}\n")
-        subscription_filter_lambda.add_environment(
+        subscription_filterlambda_.add_environment(
             "COLLECTION_ENDPOINT", collection_endpoint
         )
-        subscription_filter_lambda.add_environment("REGION", self.region)
-        subscription_filter_lambda.add_to_role_policy(
+        subscription_filterlambda_.add_environment("REGION", self.region)
+        subscription_filterlambda_.add_to_role_policy(
             iam.PolicyStatement(actions=["aoss:*"], resources=["*"])
         )
-        subscription_filter_lambda.add_to_role_policy(
+        subscription_filterlambda_.add_to_role_policy(
             iam.PolicyStatement(actions=["logs:*"], resources=["*"])
         )
-        subscription_filter_lambda.add_environment("INDEX_NAME", INDEX_NAME)
+        subscription_filterlambda_.add_environment("INDEX_NAME", INDEX_NAME)
         #################################################################################
         # The data access policy needs the lambda role ARN to allow writing.
         dap = DATAPOLICY.replace(
-            "LAMBDAROLEARN", subscription_filter_lambda.role.role_arn
+            "LAMBDAROLEARN", subscription_filterlambda_.role.role_arn
         )
         dat = opensearchserverless.CfnAccessPolicy(
             self,

@@ -2,7 +2,7 @@
 
 from aws_cdk import App
 
-from api_sqs_lambda.api_sqs_lambda_stack import ApiSqsLambdaStack
+from api_sqslambda_.api_sqs_lambda_stack import ApiSqsLambdaStack
 
 
 app = App()

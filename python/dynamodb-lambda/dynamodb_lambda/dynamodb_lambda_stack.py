@@ -3,9 +3,11 @@ from aws_cdk import (
     aws_dynamodb,
     aws_events,
     aws_events_targets,
-    Duration, Stack
+    Duration,
+    Stack,
 )
 from constructs import Construct
+
 
 class DynamodbLambdaStack(Stack):
 
@@ -14,38 +16,45 @@ class DynamodbLambdaStack(Stack):
 
         # create dynamo table
         demo_table = aws_dynamodb.Table(
-            self, "demo_table",
+            self,
+            "demo_table",
             partition_key=aws_dynamodb.Attribute(
-                name="id",
-                type=aws_dynamodb.AttributeType.STRING
-            )
+                name="id", type=aws_dynamodb.AttributeType.STRING
+            ),
         )
 
         # create producer lambda function
-        producer_lambda = aws_lambda.Function(self, "producer_lambda_function",
-                                              runtime=aws_lambda.Runtime.PYTHON_3_6,
-                                              handler="lambda_function.lambda_handler",
-                                              code=aws_lambda.Code.from_asset("./lambda/producer"))
+        producer_lambda = awslambda_.Function(
+            self,
+            "producer_lambda_function",
+            runtime=awslambda_.Runtime.PYTHON_3_6,
+            handler="lambda_function.lambda_handler",
+            code=awslambda_.Code.from_asset("./lambda/producer"),
+        )
 
-        producer_lambda.add_environment("TABLE_NAME", demo_table.table_name)
+        producerlambda_.add_environment("TABLE_NAME", demo_table.table_name)
 
         # grant permission to lambda to write to demo table
         demo_table.grant_write_data(producer_lambda)
 
         # create consumer lambda function
-        consumer_lambda = aws_lambda.Function(self, "consumer_lambda_function",
-                                              runtime=aws_lambda.Runtime.PYTHON_3_6,
-                                              handler="lambda_function.lambda_handler",
-                                              code=aws_lambda.Code.from_asset("./lambda/consumer"))
+        consumer_lambda = awslambda_.Function(
+            self,
+            "consumer_lambda_function",
+            runtime=awslambda_.Runtime.PYTHON_3_6,
+            handler="lambda_function.lambda_handler",
+            code=awslambda_.Code.from_asset("./lambda/consumer"),
+        )
 
-        consumer_lambda.add_environment("TABLE_NAME", demo_table.table_name)
+        consumerlambda_.add_environment("TABLE_NAME", demo_table.table_name)
 
         # grant permission to lambda to read from demo table
         demo_table.grant_read_data(consumer_lambda)
 
         # create a Cloudwatch Event rule
         one_minute_rule = aws_events.Rule(
-            self, "one_minute_rule",
+            self,
+            "one_minute_rule",
             schedule=aws_events.Schedule.rate(Duration.minutes(1)),
         )
 

@@ -12,9 +12,10 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_dynamodb as ddb,
     aws_s3_notifications as s3_notifications,
-    Stack
+    Stack,
 )
 from constructs import Construct
+
 
 class RekognitionLambdaS3TriggerStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
@@ -29,25 +30,29 @@ class RekognitionLambdaS3TriggerStack(Stack):
 
         # create S3 bucket to hold images
         # give new user access to the bucket
-        bucket = s3.Bucket(self, 'Bucket')
+        bucket = s3.Bucket(self, "Bucket")
         bucket.grant_read_write(user)
 
         # create DynamoDB table to hold Rekognition results
         table = ddb.Table(
-            self, 'Classifications',
-            partition_key=ddb.Attribute(name='image_name', type=ddb.AttributeType.STRING)
+            self,
+            "Classifications",
+            partition_key=ddb.Attribute(
+                name="image_name", type=ddb.AttributeType.STRING
+            ),
         )
 
         # create Lambda function
-        lambda_function = _lambda.Function(
-            self, 'RekFunction',
-            runtime = _lambda.Runtime.PYTHON_3_8,
-            handler = 'rekfunction.handler',
-            code = _lambda.Code.from_asset('rekognition_lambda_s3_trigger/lambda'),
-            environment = {
-                'BUCKET_NAME': bucket.bucket_name,
-                'TABLE_NAME': table.table_name
-            }
+        lambda_function = lambda_.Function(
+            self,
+            "RekFunction",
+            runtime=lambda_.Runtime.PYTHON_3_8,
+            handler="rekfunction.handler",
+            code=lambda_.Code.from_asset("rekognition_lambda_s3_trigger/lambda"),
+            environment={
+                "BUCKET_NAME": bucket.bucket_name,
+                "TABLE_NAME": table.table_name,
+            },
         )
 
         # add Rekognition permissions for Lambda function
@@ -59,9 +64,15 @@ class RekognitionLambdaS3TriggerStack(Stack):
         # create trigger for Lambda function with image type suffixes
         notification = s3_notifications.LambdaDestination(lambda_function)
         notification.bind(self, bucket)
-        bucket.add_object_created_notification(notification, s3.NotificationKeyFilter(suffix='.jpg'))
-        bucket.add_object_created_notification(notification, s3.NotificationKeyFilter(suffix='.jpeg'))
-        bucket.add_object_created_notification(notification, s3.NotificationKeyFilter(suffix='.png'))
+        bucket.add_object_created_notification(
+            notification, s3.NotificationKeyFilter(suffix=".jpg")
+        )
+        bucket.add_object_created_notification(
+            notification, s3.NotificationKeyFilter(suffix=".jpeg")
+        )
+        bucket.add_object_created_notification(
+            notification, s3.NotificationKeyFilter(suffix=".png")
+        )
 
         # grant permissions for lambda to read/write to DynamoDB table and bucket
         table.grant_read_write_data(lambda_function)

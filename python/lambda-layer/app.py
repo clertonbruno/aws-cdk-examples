@@ -1,7 +1,4 @@
-from aws_cdk import (
-    aws_lambda as _lambda,
-    App, RemovalPolicy, Stack
-)
+from aws_cdk import aws_lambda as _lambda, App, RemovalPolicy, Stack
 
 
 class LambdaLayerStack(Stack):
@@ -9,22 +6,27 @@ class LambdaLayerStack(Stack):
         super().__init__(app, id)
 
         # create layer
-        layer = _lambda.LayerVersion(self, 'helper_layer',
-                                     code=_lambda.Code.from_asset("layer"),
-                                     description='Common helper utility',
-                                     compatible_runtimes=[
-                                         _lambda.Runtime.PYTHON_3_6,
-                                         _lambda.Runtime.PYTHON_3_7,
-                                         _lambda.Runtime.PYTHON_3_8
-                                     ],
-                                     removal_policy=RemovalPolicy.DESTROY
-                                     )
+        layer = lambda_.LayerVersion(
+            self,
+            "helper_layer",
+            code=lambda_.Code.from_asset("layer"),
+            description="Common helper utility",
+            compatible_runtimes=[
+                lambda_.Runtime.PYTHON_3_6,
+                lambda_.Runtime.PYTHON_3_7,
+                lambda_.Runtime.PYTHON_3_8,
+            ],
+            removal_policy=RemovalPolicy.DESTROY,
+        )
         # create lambda function
-        function = _lambda.Function(self, "lambda_function",
-                                    runtime=_lambda.Runtime.PYTHON_3_8,
-                                    handler="index.handler",
-                                    code=_lambda.Code.from_asset("lambda"),
-                                    layers=[layer])
+        function = lambda_.Function(
+            self,
+            "lambda_function",
+            runtime=lambda_.Runtime.PYTHON_3_8,
+            handler="index.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            layers=[layer],
+        )
 
 
 app = App()

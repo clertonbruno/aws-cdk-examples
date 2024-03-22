@@ -2,7 +2,7 @@
 
 from aws_cdk import App
 
-from api_eventbridge_lambda.api_eventbridge_lambda import ApiEventBridgeLambdaStack
+from api_eventbridgelambda_.api_eventbridge_lambda import ApiEventBridgeLambdaStack
 
 
 app = App()

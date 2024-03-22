@@ -10,12 +10,13 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+
 class RekognitionVideoProcessorStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-         # S3 bucket to store videos
+        # S3 bucket to store videos
         video_bucket = s3.Bucket(
             self,
             "S3Bucket",
@@ -49,12 +50,10 @@ class RekognitionVideoProcessorStack(Stack):
             resources=["*"],
             effect=iam.Effect.ALLOW,
         )
-        pass_role_lambda_policy =iam.PolicyStatement(
-                actions=["iam:PassRole"],
-                resources=[
-                    rekognition_role.role_arn
-                ],
-            )
+        pass_role_lambda_policy = iam.PolicyStatement(
+            actions=["iam:PassRole"],
+            resources=[rekognition_role.role_arn],
+        )
 
         # Lambda which detects when a video has been uploaded to the S3 bucket and starts the video processing with Rekognition
         start_processing_lambda_function = lambda_.Function(
@@ -85,10 +84,12 @@ class RekognitionVideoProcessorStack(Stack):
         start_processing_lambda_function.add_to_role_policy(rekognition_lambda_policy)
         start_processing_lambda_function.add_to_role_policy(pass_role_lambda_policy)
 
-        process_video_lambda.add_to_role_policy(rekognition_lambda_policy)
+        process_videolambda_.add_to_role_policy(rekognition_lambda_policy)
 
         rekognition_sns_topic.grant_publish(process_video_lambda)
-        rekognition_sns_topic.add_subscription(sns_subs.LambdaSubscription(process_video_lambda))
+        rekognition_sns_topic.add_subscription(
+            sns_subs.LambdaSubscription(process_video_lambda)
+        )
 
         # Automatically trigger lambda when new image is uploaded to S3
         start_processing_lambda_function.add_event_source(
@@ -96,5 +97,3 @@ class RekognitionVideoProcessorStack(Stack):
                 video_bucket, events=[s3.EventType.OBJECT_CREATED]
             )
         )
-
-        

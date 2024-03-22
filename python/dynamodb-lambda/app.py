@@ -2,7 +2,7 @@
 
 from aws_cdk import App
 
-from dynamodb_lambda.dynamodb_lambda_stack import DynamodbLambdaStack
+from dynamodblambda_.dynamodb_lambda_stack import DynamodbLambdaStack
 
 
 app = App()
